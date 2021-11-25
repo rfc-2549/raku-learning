@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <unistd.h>
 #include <string.h>
 
 int
@@ -40,4 +41,11 @@ write_to_sock(int sockfd, const char *s, int len)
 	} else {
 		return return_value;
 	}
+}
+
+int
+close_socket(int sockfd)
+{
+	close(sockfd);
+	return 0;
 }
