@@ -9,6 +9,7 @@ constant LIBPATH = "$*CWD/rakunix";
 sub create_socket(--> int32) is native(LIBPATH) { * }
 sub connect_socket(int32, Str --> int32) is native(LIBPATH) { * }
 sub write_to_sock(int32, Str, int32 --> int32) is native(LIBPATH) { * }
+sub read_from_sock(int32, buf8) is native(LIBPATH) { * }
 sub close_socket(int32 --> int32) is native(LIBPATH) { * }
 
 class Socket {
@@ -16,7 +17,7 @@ class Socket {
 	
 	method new ($path) {
 		my $mfd = create_socket();
-		connect_socket($mfd, $path);
+		$mfd = -1 if connect_socket($mfd, $path); 
 		self.bless(sockfd => $mfd);
 	}
 
@@ -29,6 +30,9 @@ class Socket {
 		write_to_sock(self.sockfd, $str ~ "\n", $len);
 
 	}
+	method read($buf) {
+		read_from_sock(self.sockfd, $buf);
+	}
 	method close() {
 		close_socket(self.sockfd);
 	}
@@ -36,7 +40,16 @@ class Socket {
 }
 
 my $sock = Socket.new("socket");
+my $buf = buf8;
+
+if $sock.sockfd == -1 {
+	say "Error creating socket, dying!";
+	exit;
+}
 
 $sock.put("Hello!");
-$sock.close();
+$sock.read($buf);
 
+print $buf.decode("utf-8");
+
+$sock.close;

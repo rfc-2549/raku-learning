@@ -3,13 +3,14 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
 
 int
 create_socket()
 {
 	int sockfd = socket(PF_UNIX, SOCK_STREAM, 0);
 	if(sockfd == -1) {
-		fprintf(stderr,"rakunix: error creating socket\n");
+		fprintf(stderr,"rakunix: error creating socket: %s\n",strerror(errno));
 		return -1;
 	} else {
 		return sockfd;
@@ -41,6 +42,23 @@ write_to_sock(int sockfd, const char *s, int len)
 	} else {
 		return return_value;
 	}
+}
+
+int
+read_from_sock(int sockfd, char *xt_buf)
+{
+	int c;
+     char buf[8192];
+	while((c = read(sockfd, buf, sizeof(buf))) > 0) {
+		strncpy(xt_buf, buf, c);
+	}
+	if(c == -1) {
+		fprintf(stderr,"rakunix: Error reading from socket: %s\n",strerror(errno));
+		return -1;
+	} else {
+		return 0;
+	}
+	
 }
 
 int
