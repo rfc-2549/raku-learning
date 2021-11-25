@@ -25,22 +25,23 @@ class Socket {
 		my $len = $str.chars;
 		write_to_sock(self.sockfd, $str, $len);
 	}
+
 	method put($str) {
 		my $len = $str.chars + 1;
 		write_to_sock(self.sockfd, $str ~ "\n", $len);
-
 	}
+	
 	method read($buf) {
 		read_from_sock(self.sockfd, $buf);
 	}
+
 	method close() {
 		close_socket(self.sockfd);
 	}
-
 }
 
 my $sock = Socket.new("socket");
-my $buf = buf8;
+my $buf = buf8.allocate(1000); # TODO: Dinamically allocate this
 
 if $sock.sockfd == -1 {
 	say "Error creating socket, dying!";

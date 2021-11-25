@@ -1,0 +1,28 @@
+# Raku code 
+
+
+sub read_from_sock(int32, buf8) is native(LIBPATH) { * }
+# ...
+method read($buf) {
+	read_from_sock(self.sockfd, $buf);
+}
+# ...
+
+// C Code
+int
+read_from_sock(int sockfd, char *xt_buf)
+{
+	int c;
+	char buf[8192];
+	while((c = read(sockfd, buf, sizeof(buf))) > 0) {
+
+		if(c == -1) {
+			fprintf(stderr,"rakunix: Error reading from socket: %s\n",strerror(errno));
+			return -1;
+		} else {
+			strncpy(xt_buf, buf, c);
+		}
+
+	}
+
+}
