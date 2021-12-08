@@ -25,7 +25,7 @@ connect_socket(int sockfd, const char *path)
 	strcpy(addr.sun_path,path);
 	int return_value = connect(sockfd, (struct sockaddr*)&addr, sizeof(addr));
 	if(return_value == -1) {
-		fprintf(stderr,"rakunix: error connecting to socket\n");
+		fprintf(stderr,"rakunix: error connecting to socket: %s\n",strerror(errno));
 		return -1;
 	} else {
 		return 0;
@@ -48,17 +48,13 @@ int
 read_from_sock(int sockfd, char *xt_buf)
 {
 	int c;
+	int i = 0;
      char buf[8192];
-	while((c = read(sockfd, buf, sizeof(buf))) > 0) {
+	while((c = read(sockfd, buf, 1)) > 0) {
 		strncpy(xt_buf, buf, c);
+		i++;
 	}
-	if(c == -1) {
-		fprintf(stderr,"rakunix: Error reading from socket: %s\n",strerror(errno));
-		return -1;
-	} else {
-		return 0;
-	}
-	
+	return i;
 }
 
 int
